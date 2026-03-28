@@ -20,8 +20,8 @@ pipeline {
 
         stage("Checkout from SCM") {
             steps {
-                // IMPORTANT: The credentialsId here must exactly match your Jenkins Credential ID
-                git branch: 'main', credentialsId: 'github-pat', url: 'https://github.com/saikumarminukur176/gitops-register-app.git'
+                // CHANGED: Now looking for the ID 'saikumarminukur176'
+                git branch: 'main', credentialsId: 'saikumarminukur176', url: 'https://github.com/saikumarminukur176/gitops-register-app.git'
             }
         }
 
@@ -44,8 +44,8 @@ pipeline {
                     git commit -m "Updated Deployment Manifest to tag ${IMAGE_TAG}"
                 """
                 
-                // IMPORTANT: The credentialsId here must also exactly match!
-                withCredentials([gitUsernamePassword(credentialsId: 'github-pat', gitToolName: 'Default')]) {
+                // CHANGED: Now looking for the ID 'saikumarminukur176'
+                withCredentials([gitUsernamePassword(credentialsId: 'saikumarminukur176', gitToolName: 'Default')]) {
                     sh "git push https://github.com/saikumarminukur176/gitops-register-app.git main"
                 }
             }
