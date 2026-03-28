@@ -1,9 +1,15 @@
 pipeline {
     agent { label "Jenkins-Agent" }
+    
+    // 1. ADD THIS BLOCK so sed knows what to replace
+    environment {
+        APP_NAME = "my-app" // Change this to match your actual app name
+        IMAGE_TAG = "${env.BUILD_NUMBER}" // Or whatever dynamic tag you use
+    }
+
     tools {
         jdk "java-11"
         maven "maven-3.8.5"
-    
     }
 
     stages {
@@ -21,6 +27,7 @@ pipeline {
 
         stage("Update the Deployment Tags") {
             steps {
+                // 2. sed will now successfully use the variables defined above
                 sh """
                    cat deployment.yaml
                    sed -i 's/${APP_NAME}.*/${APP_NAME}:${IMAGE_TAG}/g' deployment.yaml
@@ -35,13 +42,14 @@ pipeline {
                    git config --global user.name "saikumarminuku176"
                    git config --global user.email "saikumarminukuri@gmail.com"
                    git add deployment.yaml
-                   git commit -m "Updated Deployment Manifest"
+                   git commit -m "Updated Deployment Manifest to tag ${IMAGE_TAG}"
                 """
-                withCredentials([gitUsernamePassword(credentialsId: 'github', gitToolName: 'Default')]) {
-                  sh "git push https://github.com/saikumarminukur176/gitops-register-app.git main"
+                
+                // 3. Bulletproof Git Push (Injects token directly into URL securely)
+                withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PAT', usernameVariable: 'GIT_USER')]) {
+                  sh "git push https://${GIT_USER}:${GIT_PAT}@github.com/saikumarminukur176/gitops-register-app.git main"
                 }
             }
         }
-      
     }
 }
