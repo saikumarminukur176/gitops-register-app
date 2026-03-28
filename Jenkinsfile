@@ -20,6 +20,7 @@ pipeline {
 
         stage("Checkout from SCM") {
             steps {
+                // IMPORTANT: The credentialsId here must exactly match your Jenkins Credential ID
                 git branch: 'main', credentialsId: 'github-pat', url: 'https://github.com/saikumarminukur176/gitops-register-app.git'
             }
         }
@@ -43,9 +44,8 @@ pipeline {
                     git commit -m "Updated Deployment Manifest to tag ${IMAGE_TAG}"
                 """
                 
-                // Use gitUsernamePassword to bind the credential securely
+                // IMPORTANT: The credentialsId here must also exactly match!
                 withCredentials([gitUsernamePassword(credentialsId: 'github-pat', gitToolName: 'Default')]) {
-                    // Just use the standard HTTPS URL without injecting variables
                     sh "git push https://github.com/saikumarminukur176/gitops-register-app.git main"
                 }
             }
