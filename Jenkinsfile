@@ -43,11 +43,10 @@ pipeline {
                     git commit -m "Updated Deployment Manifest to tag ${IMAGE_TAG}"
                 """
                 
-                withCredentials([usernamePassword(credentialsId: 'github-pat', passwordVariable: 'GIT_PAT', usernameVariable: 'GIT_USER')]) {
-                    // This is the line that was fixed! Notice the single quotes (' ') around the command.
-                    sh 'git push https://$GIT_USER:$GIT_PAT@github.com/saikumarminukur176/gitops-register-app.git main'
+                // Use gitUsernamePassword to bind the credential securely
+                withCredentials([gitUsernamePassword(credentialsId: 'github-pat', gitToolName: 'Default')]) {
+                    // Just use the standard HTTPS URL without injecting variables
+                    sh "git push https://github.com/saikumarminukur176/gitops-register-app.git main"
                 }
             }
         }
-    }
-}
